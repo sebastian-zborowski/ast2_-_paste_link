@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         [AST2] - PASTE_LINK
-// @version      1.1
+// @version      1.2
 // @description  Automatycznie otwiera AST2 z numerem seryjnym zlecenia z Fixably. Rzoszerzenie działa w kooperacji z: FIXABLY_-_INTERFACE_TWEAKS
 // @author       Sebastian Zborowski
 // @match        https://diagnostics.apple.com/*
 // @updateURL    https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/%5BAST2%5D%20-%20PASTE_LINK-1.0.user.js
 // @downloadURL  https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/%5BAST2%5D%20-%20PASTE_LINK-1.0.user.js
 // @grant        none
+// @source       https://github.com/sebastian-zborowski
 // ==/UserScript==
 
 //Disclaimer:
