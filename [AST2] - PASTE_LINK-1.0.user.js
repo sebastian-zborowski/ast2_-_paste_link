@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         [AST2] - PASTE_LINK
-// @version      1.2
+// @version      1.3
 // @description  Automatycznie otwiera AST2 z numerem seryjnym zlecenia z Fixably. Rzoszerzenie działa w kooperacji z: FIXABLY_-_INTERFACE_TWEAKS
 // @author       Sebastian Zborowski
 // @match        https://diagnostics.apple.com/*
@@ -17,23 +17,39 @@
 
 //Ostatnia aktualizacja: 30.07.2025
 
-(function() {
+(function () {
     'use strict';
 
-    const CURRENT_VERSION = '1.2'; // musisz ręcznie zaktualizować gdy wypuszczasz wersję
+    const CURRENT_VERSION = '1.3'; // ręcznie modyfikować, ma zgadzać się z wersją skryptu w nagłówku
     const REMOTE_META_URL = 'https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/%5BAST2%5D%20-%20PASTE_LINK-1.0.user.js';
+
+    const LAST_CHECK_KEY = 'ast2_update_last_check';
+    const now = Date.now();
+    const lastCheck = parseInt(localStorage.getItem(LAST_CHECK_KEY) || '0', 10);
+
+    if (now - lastCheck < 36200000) {
+        return; // sprawdzono co 24h
+    }
+    localStorage.setItem(LAST_CHECK_KEY, now.toString());
 
     fetch(REMOTE_META_URL)
         .then(r => r.text())
         .then(text => {
             const remoteVersionMatch = text.match(/@version\s+([0-9.]+)/);
-            if (!remoteVersionMatch) return;
+            if (!remoteVersionMatch) {
+                console.log('[AST2] Nie znaleziono wersji zdalnej');
+                return;
+            }
 
             const remoteVersion = remoteVersionMatch[1];
+            console.log('[AST2] Wersja zdalna:', remoteVersion, '| Lokalna:', CURRENT_VERSION);
 
             if (isNewerVersion(remoteVersion, CURRENT_VERSION)) {
                 notifyUpdate(remoteVersion);
             }
+        })
+        .catch(err => {
+            console.warn('[AST2] Błąd sprawdzania aktualizacji:', err);
         });
 
     function isNewerVersion(remote, local) {
@@ -50,26 +66,24 @@
 
     function notifyUpdate(newVersion) {
         const note = document.createElement('div');
-        note.textContent = `🔔 Dostępna nowa wersja skryptu [AST2] - PASTE_LINK: ${newVersion}`;
-        note.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #ffd700;
-            padding: 10px 20px;
-            border: 2px solid #000;
-            border-radius: 8px;
-            z-index: 99999;
-            font-weight: bold;
+        note.innerHTML = `
+            🔔 Dostępna nowa wersja skryptu: <strong>${newVersion}</strong><br>
+            <a href="${REMOTE_META_URL}" target="_blank">Kliknij tutaj, aby pobrać</a>
         `;
-        const link = document.createElement('a');
-        link.href = REMOTE_META_URL;
-        link.target = '_blank';
-        link.textContent = 'Kliknij, aby zaktualizować';
-        link.style.display = 'block';
-        link.style.marginTop = '8px';
+        Object.assign(note.style, {
+            position: 'fixed',
+            top: '10px',
+            right: '10px',
+            background: '#fff8b5',
+            border: '2px solid #d3a600',
+            padding: '12px',
+            fontSize: '14px',
+            borderRadius: '10px',
+            zIndex: '99999',
+            color: '#333',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+        });
 
-        note.appendChild(link);
         document.body.appendChild(note);
     }
 })();
