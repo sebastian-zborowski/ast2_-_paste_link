@@ -20,20 +20,56 @@
 (function() {
     'use strict';
 
-    const serial = new URLSearchParams(location.search).get('serial');
-    if (!serial) return;
+    const CURRENT_VERSION = '1.2'; // musisz ręcznie zaktualizować gdy wypuszczasz wersję
+    const REMOTE_META_URL = 'https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/%5BAST2%5D%20-%20PASTE_LINK-1.0.user.js';
 
-    const tryFill = setInterval(() => {
-        const input = document.querySelector('input#serial-input');
+    fetch(REMOTE_META_URL)
+        .then(r => r.text())
+        .then(text => {
+            const remoteVersionMatch = text.match(/@version\s+([0-9.]+)/);
+            if (!remoteVersionMatch) return;
 
-        if (input) {
-            clearInterval(tryFill);
+            const remoteVersion = remoteVersionMatch[1];
 
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-            nativeInputValueSetter.call(input, serial);
+            if (isNewerVersion(remoteVersion, CURRENT_VERSION)) {
+                notifyUpdate(remoteVersion);
+            }
+        });
 
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
+    function isNewerVersion(remote, local) {
+        const r = remote.split('.').map(Number);
+        const l = local.split('.').map(Number);
+        for (let i = 0; i < Math.max(r.length, l.length); i++) {
+            const rv = r[i] || 0;
+            const lv = l[i] || 0;
+            if (rv > lv) return true;
+            if (rv < lv) return false;
         }
-    }, 300);
+        return false;
+    }
+
+    function notifyUpdate(newVersion) {
+        const note = document.createElement('div');
+        note.textContent = `🔔 Dostępna nowa wersja skryptu [AST2] - PASTE_LINK: ${newVersion}`;
+        note.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ffd700;
+            padding: 10px 20px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            z-index: 99999;
+            font-weight: bold;
+        `;
+        const link = document.createElement('a');
+        link.href = REMOTE_META_URL;
+        link.target = '_blank';
+        link.textContent = 'Kliknij, aby zaktualizować';
+        link.style.display = 'block';
+        link.style.marginTop = '8px';
+
+        note.appendChild(link);
+        document.body.appendChild(note);
+    }
 })();
