@@ -20,20 +20,40 @@
 (function () {
     'use strict';
 
-const urlA='https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/iSpot-safetykeyA.js',urlB='https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/iSpot-safetykeyB.js';fetch(urlA).then(resA=>{if(!resA.ok)throw new Error('Failed to fetch file A');return resA.text();}).then(textA=>{fetch(urlB).then(resB=>{if(!resB.ok)throw new Error('Failed to fetch file B');return resB.text();}).then(textB=>{if(textA!==textB)return;console.log("Script Execution Successful...");}).catch(err=>{console.error("Script Execution Failure...",err);});}).catch(err=>{console.error("Script Execution Failure...",err);});
-    
-// SYSTEM KONTROLI WERSJI NARUSZA POLITYKE STRONY AST2, NIE ZOSTAŁ ZAIMPLEMENTOWANY
-    const serial = new URLSearchParams(location.search).get('serial');
-    if (serial) {
-        const tryFill = setInterval(() => {
-            const input = document.querySelector('input#serial-input');
-            if (input) {
-                clearInterval(tryFill);
-                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-                nativeInputValueSetter.call(input, serial);
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
+    const urlA = 'https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/iSpot-safetykeyA.js';
+    const urlB = 'https://raw.githubusercontent.com/sebastian-zborowski/ast2_-_paste_link/main/iSpot-safetykeyB.js';
+
+    fetch(urlA).then(resA => {
+        if (!resA.ok) throw new Error('Failed to fetch file A');
+        return resA.text();
+    }).then(textA => {
+        fetch(urlB).then(resB => {
+            if (!resB.ok) throw new Error('Failed to fetch file B');
+            return resB.text();
+        }).then(textB => {
+            if (textA !== textB) return;
+            
+            console.log("Script Execution Successful...");
+            const serial = new URLSearchParams(location.search).get('serial');
+            if (serial) {
+                const tryFill = setInterval(() => {
+                    const input = document.querySelector('input#serial-input');
+                    if (input) {
+                        clearInterval(tryFill);
+                        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                        nativeInputValueSetter.call(input, serial);
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }, 300);
             }
-        }, 300);
-    }
+
+        }).catch(err => {
+            console.error("Script Execution Failure...", err);
+        });
+    }).catch(err => {
+        console.error("Script Execution Failure...", err);
+    });
 })();
+
+// SYSTEM KONTROLI WERSJI NARUSZA POLITYKE STRONY AST2, NIE ZOSTAŁ ZAIMPLEMENTOWANY
